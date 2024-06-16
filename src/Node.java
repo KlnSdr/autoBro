@@ -25,6 +25,9 @@ public class Node {
     }
 
     public ArrayList<Node> getEdges(String symbol) {
+        if (!edges.containsKey(symbol)) {
+            return new ArrayList<>();
+        }
         return edges.get(symbol);
     }
 

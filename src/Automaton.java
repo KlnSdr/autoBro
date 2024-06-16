@@ -3,6 +3,7 @@ import java.util.*;
 public class Automaton {
     private final ArrayList<Node> starts = new ArrayList<>();
     private final ArrayList<Node> finals = new ArrayList<>();
+    private final ArrayList<String> symbols = new ArrayList<>();
 
     public void addStart(Node node) {
         starts.add(node);
@@ -10,6 +11,14 @@ public class Automaton {
 
     public void addFinal(Node node) {
         finals.add(node);
+    }
+
+    public void addSymbol(String symbol) {
+        symbols.add(symbol);
+    }
+
+    public ArrayList<String> getSymbols() {
+        return symbols;
     }
 
     public ArrayList<Node> getStarts() {
@@ -70,5 +79,57 @@ public class Automaton {
         }
 
         return sb.toString();
+    }
+
+    private HashMap<String, HashSet<Node>> getDefaultMap() {
+        final HashMap<String, HashSet<Node>> startMap = new HashMap<>();
+        for (String symbol : symbols) {
+            HashSet<Node> nextSet = new HashSet<>();
+            startMap.put(symbol, nextSet);
+        }
+
+        return startMap;
+    }
+
+    public Automaton toDFA() {
+        final Queue<HashSet<Node>> queue = new LinkedList<>();
+        final HashMap<HashSet<Node>, HashMap<String, HashSet<Node>>> table = new HashMap<>();
+
+        // Initialize the queue and table
+        HashSet<Node> startSet = new HashSet<>(starts);
+        queue.add(startSet);
+
+        List<String> symbols = getSymbols();
+
+        while (!queue.isEmpty()) {
+            HashSet<Node> currentSet = queue.poll();
+
+            if (table.containsKey(currentSet)) {
+                continue;
+            }
+
+            HashMap<String, HashSet<Node>> currentMap = new HashMap<>(getDefaultMap());
+
+            for (String symbol : symbols) {
+                for (Node node : currentSet) {
+                    for (Node neighbor: node.getEdges(symbol)) {
+                        currentMap.get(symbol).add(neighbor);
+                    }
+                }
+            }
+
+            table.put(currentSet, currentMap);
+
+            for (HashSet<Node> nextSet : currentMap.values()) {
+                if (!table.containsKey(nextSet)) {
+                    queue.add(nextSet);
+                }
+            }
+        }
+
+        // Create the new DFA nodes
+        Automaton dfa = new Automaton();
+
+        return dfa;
     }
 }

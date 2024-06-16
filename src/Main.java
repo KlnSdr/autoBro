@@ -15,8 +15,12 @@ public class Main {
         three.addEdge("a", four);
 
         final Automaton automaton = new Automaton();
+        automaton.addSymbol("a");
+        automaton.addSymbol("b");
+
         automaton.addStart(zero);
         automaton.addFinal(four);
-        System.out.println(automaton);
+
+        automaton.toDFA();
     }
 }
