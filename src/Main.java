@@ -21,6 +21,6 @@ public class Main {
         automaton.addStart(zero);
         automaton.addFinal(four);
 
-        automaton.toDFA();
+        System.out.println(automaton.toDFA());
     }
 }

@@ -128,7 +128,34 @@ public class Automaton {
         }
 
         // Create the new DFA nodes
+        final ArrayList<HashSet<Node>> multiNodes = new ArrayList<>(table.keySet());
+        final ArrayList<Node> dfaNodes = new ArrayList<>();
+        for (HashSet<Node> multiNode : multiNodes) {
+            Node dfaNode = new Node(multiNodes.indexOf(multiNode));
+            dfaNodes.add(dfaNode);
+        }
+
         Automaton dfa = new Automaton();
+
+        for (HashSet<Node> multiNode : multiNodes) {
+            Node node = dfaNodes.get(multiNodes.indexOf(multiNode));
+
+            for (Node n : multiNode) {
+                if (starts.contains(n)) {
+                    dfa.addStart(node);
+                }
+                if (finals.contains(n)) {
+                    dfa.addFinal(node);
+                }
+            }
+
+            for (String symbol : symbols) {
+                HashSet<Node> nextMultiNode = table.get(multiNode).get(symbol);
+                Node nextDfaNode = dfaNodes.get(multiNodes.indexOf(nextMultiNode));
+
+                node.addEdge(symbol, nextDfaNode);
+            }
+        }
 
         return dfa;
     }
