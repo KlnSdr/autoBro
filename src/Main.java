@@ -1,26 +1,32 @@
 public class Main {
     public static void main(String[] args) {
-        final Node zero = new Node(0);
         final Node one = new Node(1);
         final Node two = new Node(2);
         final Node three = new Node(3);
         final Node four = new Node(4);
+        final Node five = new Node(5);
+        final Node six = new Node(6);
 
-        zero.addEdge("a", one);
-        zero.addEdge("a", three);
-        one.addEdge("b", two);
+        one.addEdge("b", one);
+        one.addEdge("a", three);
         two.addEdge("b", one);
-        two.addEdge("b", three);
-        three.addEdge("a", one);
+        two.addEdge("b", four);
+        three.addEdge("a", two);
         three.addEdge("a", four);
+        three.addEdge("b", six);
+        four.addEdge("b", five);
+        five.addEdge("b", three);
+        five.addEdge("b", six);
+        five.addEdge("a", one);
+        six.addEdge("a", two);
 
         final Automaton automaton = new Automaton();
         automaton.addSymbol("a");
         automaton.addSymbol("b");
 
-        automaton.addStart(zero);
-        automaton.addFinal(four);
+        automaton.addStart(one);
+        automaton.addFinal(one);
 
-        System.out.println(automaton.invert());
+        System.out.println(automaton.minimizeByBrzozowski());
     }
 }

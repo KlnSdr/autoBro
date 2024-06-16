@@ -35,7 +35,7 @@ public class Node {
         ArrayList<String> delta = new ArrayList<>();
         for (String symbol : edges.keySet()) {
             for (Node node : edges.get(symbol)) {
-                delta.add("(" + name + ", " + symbol + ", " + node.getName() + ")");
+                delta.add("(" + name + ", '" + symbol + "', " + node.getName() + ")");
             }
         }
         return delta;
@@ -48,5 +48,22 @@ public class Node {
     @Override
     public String toString() {
         return Integer.toString(name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Node)) {
+            return false;
+        }
+        Node node = (Node) obj;
+        return name == node.name;
+    }
+
+    @Override
+    public int hashCode() {
+        return name;
     }
 }

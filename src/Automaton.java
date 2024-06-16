@@ -58,25 +58,48 @@ public class Automaton {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Starts: [");
-        for (Node node : starts) {
-            sb.append(node.getName()).append(" ");
+
+        sb.append("NFA\n{\n");
+
+        sb.append("alphabet = mkSet \"");
+        for (String symbol : symbols) {
+            sb.append(symbol);
         }
-        sb.append("]");
-        sb.append("\nEnds: [");
-        for (Node node : finals) {
-            sb.append(node.getName()).append(" ");
-        }
-        sb.append("]\n");
+        sb.append("\",\n");
 
         final List<Node> nodes = getNodes();
 
+        sb.append("states = mkSet [");
+        for (Node node : nodes) {
+            sb.append(node.getName()).append(", ");
+        }
+        sb.delete(sb.length() - 2, sb.length());
+        sb.append("],\n");
+
+        sb.append("starts = mkSet [");
+        for (Node node : starts) {
+            sb.append(node.getName()).append(", ");
+        }
+        sb.delete(sb.length() - 2, sb.length());
+        sb.append("],");
+        sb.append("\nfinals = mkSet [");
+        for (Node node : finals) {
+            sb.append(node.getName()).append(", ");
+        }
+        sb.delete(sb.length() - 2, sb.length());
+        sb.append("],\n");
+
+        sb.append("trans = collect [\n");
         for (Node node: nodes) {
             ArrayList<String> delta = node.getDelta();
             for (String edge : delta) {
-                sb.append(edge).append("\n");
+                sb.append(edge).append(",\n");
             }
         }
+        sb.delete(sb.length() - 2, sb.length());
+
+        sb.append("]");
+        sb.append("\n}");
 
         return sb.toString();
     }
@@ -108,7 +131,10 @@ public class Automaton {
                 continue;
             }
 
-            HashMap<String, HashSet<Node>> currentMap = new HashMap<>(getDefaultMap());
+            HashMap<String, HashSet<Node>> currentMap = getDefaultMap();
+            // Z   | a  | b
+            // {5} | {1, 4, 6} | {2, 3}
+
 
             for (String symbol : symbols) {
                 for (Node node : currentSet) {
@@ -128,22 +154,27 @@ public class Automaton {
         }
 
         // Create the new DFA nodes
-        final ArrayList<HashSet<Node>> multiNodes = new ArrayList<>(table.keySet());
-        final ArrayList<Node> dfaNodes = new ArrayList<>();
-        for (HashSet<Node> multiNode : multiNodes) {
-            Node dfaNode = new Node(multiNodes.indexOf(multiNode));
-            dfaNodes.add(dfaNode);
+        Automaton dfa = new Automaton();
+        for (String symbol : symbols) {
+            dfa.addSymbol(symbol);
         }
 
-        Automaton dfa = new Automaton();
+        final ArrayList<HashSet<Node>> multiNodes = new ArrayList<>(table.keySet());
+        final HashMap<HashSet<Node>, Node> dfaNodes = new HashMap<>();
+        for (HashSet<Node> multiNode : multiNodes) {
+            Node node = new Node(multiNodes.indexOf(multiNode));
+            dfaNodes.put(multiNode, node);
+
+            if (multiNode.equals(startSet)) {
+                dfa.addStart(node);
+            }
+        }
+
 
         for (HashSet<Node> multiNode : multiNodes) {
-            Node node = dfaNodes.get(multiNodes.indexOf(multiNode));
+            Node node = dfaNodes.get(multiNode);
 
             for (Node n : multiNode) {
-                if (starts.contains(n)) {
-                    dfa.addStart(node);
-                }
                 if (finals.contains(n)) {
                     dfa.addFinal(node);
                 }
@@ -151,7 +182,7 @@ public class Automaton {
 
             for (String symbol : symbols) {
                 HashSet<Node> nextMultiNode = table.get(multiNode).get(symbol);
-                Node nextDfaNode = dfaNodes.get(multiNodes.indexOf(nextMultiNode));
+                Node nextDfaNode = dfaNodes.get(nextMultiNode);
 
                 node.addEdge(symbol, nextDfaNode);
             }
@@ -162,6 +193,9 @@ public class Automaton {
 
     public Automaton invert() {
         Automaton inverted = new Automaton();
+        for (String symbol : symbols) {
+            inverted.addSymbol(symbol);
+        }
 
         final List<Node> nodes = getNodes();
         final HashMap<Integer, Node> invertedNodes = new HashMap<>();
@@ -188,5 +222,9 @@ public class Automaton {
         }
 
         return inverted;
+    }
+
+    public Automaton minimizeByBrzozowski() {
+        return toDFA().invert().toDFA().invert().toDFA();
     }
 }
