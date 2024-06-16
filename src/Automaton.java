@@ -224,7 +224,29 @@ public class Automaton {
         return inverted;
     }
 
-    public Automaton minimizeByBrzozowski() {
-        return toDFA().invert().toDFA().invert().toDFA();
+    public Automaton minimizeByBrzozowski(boolean verboseOutput) {
+        final Automaton dfa = toDFA();
+        final Automaton inverted = dfa.invert();
+        final Automaton dfa2 = inverted.toDFA();
+        final Automaton inverted2 = dfa2.invert();
+        final Automaton minimized = inverted2.toDFA();
+
+        if (verboseOutput) {
+            System.out.println("Original DFA");
+            System.out.println(dfa);
+            System.out.println();
+            System.out.println("Inverted DFA");
+            System.out.println(inverted);
+            System.out.println();
+            System.out.println("DFA 2");
+            System.out.println(dfa2);
+            System.out.println();
+            System.out.println("Inverted 2");
+            System.out.println(inverted2);
+            System.out.println();
+            System.out.println("Minimized DFA");
+        }
+
+        return minimized;
     }
 }
