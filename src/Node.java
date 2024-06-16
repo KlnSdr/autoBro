@@ -28,7 +28,22 @@ public class Node {
         return edges.get(symbol);
     }
 
+    public ArrayList<String> getDelta() {
+        ArrayList<String> delta = new ArrayList<>();
+        for (String symbol : edges.keySet()) {
+            for (Node node : edges.get(symbol)) {
+                delta.add("(" + name + ", " + symbol + ", " + node.getName() + ")");
+            }
+        }
+        return delta;
+    }
+
     public void setEdges(String symbol, ArrayList<Node> nodes) {
         edges.put(symbol, nodes);
+    }
+
+    @Override
+    public String toString() {
+        return Integer.toString(name);
     }
 }
