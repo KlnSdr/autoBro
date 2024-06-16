@@ -159,4 +159,34 @@ public class Automaton {
 
         return dfa;
     }
+
+    public Automaton invert() {
+        Automaton inverted = new Automaton();
+
+        final List<Node> nodes = getNodes();
+        final HashMap<Integer, Node> invertedNodes = new HashMap<>();
+        for (Node node : nodes) {
+            Node invertedNode = new Node(node.getName());
+            invertedNodes.put(invertedNode.getName(), invertedNode);
+        }
+
+        for (Node node: getStarts()) {
+            inverted.addFinal(invertedNodes.get(node.getName()));
+        }
+
+        for (Node node: getFinals()) {
+            inverted.addStart(invertedNodes.get(node.getName()));
+        }
+
+        for (Node node: nodes) {
+            final HashMap<String, ArrayList<Node>> edges = node.getEdges();
+            for (String symbol : edges.keySet()) {
+                for (Node neighbor : edges.get(symbol)) {
+                    invertedNodes.get(neighbor.getName()).addEdge(symbol, invertedNodes.get(node.getName()));
+                }
+            }
+        }
+
+        return inverted;
+    }
 }
