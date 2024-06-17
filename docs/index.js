@@ -94,12 +94,40 @@ class Automaton {
   }
 
   toDFA() {
+    return this;
     const dfa = new Automaton();
     return dfa;
   }
 
   invert() {
     const inverted = new Automaton();
+    this.getSymbols().forEach((sym) => inverted.addSymbol(sym));
+
+    const nodes = this.getNodes();
+    const invertedNodes = {};
+    nodes.forEach((node) => {
+      invertedNodes[node.getName()] = new Node(node.getName());
+    });
+
+    this.getStarts().forEach((node) => {
+      inverted.addFinal(invertedNodes[node.getName()]);
+    });
+
+    this.getFinals().forEach((node) => {
+      inverted.addStart(invertedNodes[node.getName()]);
+    });
+
+    nodes.forEach((node) => {
+      this.getSymbols().forEach((symbol) => {
+        node.getEdges(symbol).forEach((neighbor) => {
+          invertedNodes[neighbor.getName()].addEdge(
+            symbol,
+            invertedNodes[node.getName()]
+          );
+        });
+      });
+    });
+
     return inverted;
   }
 
@@ -198,7 +226,10 @@ function start() {
   automaton.addFinal(nine);
   automaton.addFinal(ten);
 
-  automaton.toDFA();
+    console.log(automaton.toString());
+    console.log(automaton.invert().toString());
+
+  // automaton.toDFA();
 }
 
 start();
