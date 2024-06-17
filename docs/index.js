@@ -92,6 +92,20 @@ class Automaton {
 
     return output;
   }
+
+  toDFA() {
+    const dfa = new Automaton();
+    return dfa;
+  }
+
+  invert() {
+    const inverted = new Automaton();
+    return inverted;
+  }
+
+  minimize() {
+    return this.toDFA().invert().toDFA().invert().toDFA();
+  }
 }
 
 class Node {
@@ -184,6 +198,7 @@ function start() {
   automaton.addFinal(nine);
   automaton.addFinal(ten);
 
+  automaton.toDFA();
 }
 
 start();
