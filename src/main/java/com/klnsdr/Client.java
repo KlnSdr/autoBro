@@ -14,61 +14,55 @@ public class Client {
         var document = HTMLDocument.current();
         var div = document.createElement("div");
 
+        var tableStyle = document.createElement("table"); // peak web design
+
         var headline = document.createElement("h1");
-        headline.setInnerText("autoBro");
+        headline.setInnerText("Automaten minimieren");
         div.appendChild(headline);
 
         var lblNumStates = document.createElement("label");
         lblNumStates.setInnerText("Anzahl der Zustände:");
-        div.appendChild(lblNumStates);
 
         HTMLInputElement txtNumStates = (HTMLInputElement) document.createElement("input");
         txtNumStates.setId("txtNumStates");
         txtNumStates.setType("number");
-        txtNumStates.setValue("1");
-        div.appendChild(txtNumStates);
+        txtNumStates.setValue("2");
 
-        var newline = document.createElement("br");
-        div.appendChild(newline);
+        tableStyle.appendChild(styleTableRow(lblNumStates, txtNumStates));
 
         var lblNumSymbols = document.createElement("label");
         lblNumSymbols.setInnerText("Symbole (getrennt durch Komma):");
-        div.appendChild(lblNumSymbols);
 
         HTMLInputElement txtSymbols = (HTMLInputElement) document.createElement("input");
         txtSymbols.setId("txtSymbols");
         txtSymbols.setValue("a,b");
-        div.appendChild(txtSymbols);
 
-        var newline2 = document.createElement("br");
-        div.appendChild(newline2);
+        tableStyle.appendChild(styleTableRow(lblNumSymbols, txtSymbols));
 
         var lblStartState = document.createElement("label");
         lblStartState.setInnerText("Startzustände (getrennt durch Komma):");
-        div.appendChild(lblStartState);
 
         HTMLInputElement txtStartStates = (HTMLInputElement) document.createElement("input");
         txtStartStates.setId("txtStartStates");
-        txtStartStates.setValue("1");
-        div.appendChild(txtStartStates);
+        txtStartStates.setValue("0");
 
-        var newline3 = document.createElement("br");
-        div.appendChild(newline3);
+        tableStyle.appendChild(styleTableRow(lblStartState, txtStartStates));
 
         var lblFinalStates = document.createElement("label");
         lblFinalStates.setInnerText("Endzustände (getrennt durch Komma):");
-        div.appendChild(lblFinalStates);
 
         HTMLInputElement txtFinalStates = (HTMLInputElement) document.createElement("input");
         txtFinalStates.setId("txtFinalStates");
         txtFinalStates.setValue("1");
-        div.appendChild(txtFinalStates);
 
-        var newline4 = document.createElement("br");
-        div.appendChild(newline4);
+        tableStyle.appendChild(styleTableRow(lblFinalStates, txtFinalStates));
+
+        div.appendChild(tableStyle);
 
         var divOutTable = document.createElement("div");
         HTMLTextAreaElement taOutput = (HTMLTextAreaElement) document.createElement("textarea");
+        taOutput.setCols(90);
+        taOutput.setRows(20);
 
         var btnGenerate = document.createElement("button");
         btnGenerate.setInnerText("übernehmen");
@@ -84,6 +78,7 @@ public class Client {
             var bttnMinimize = document.createElement("button");
             bttnMinimize.setInnerText("Minimieren");
             bttnMinimize.addEventListener("click", e2 -> {
+                taOutput.setValue("");
                 var automaton = buildAutomaton(startStates, finalStates, symbols, numStates, transitions);
                 taOutput.setValue(automaton.minimize().toString());
             });
@@ -94,6 +89,19 @@ public class Client {
         div.appendChild(taOutput);
 
         document.getBody().appendChild(div);
+    }
+
+    private static Node styleTableRow(Node lbl, Node element) {
+        var tr = HTMLDocument.current().createElement("tr");
+        var td1 = HTMLDocument.current().createElement("td");
+        td1.appendChild(lbl);
+        tr.appendChild(td1);
+
+        var td2 = HTMLDocument.current().createElement("td");
+        td2.appendChild(element);
+        tr.appendChild(td2);
+
+        return tr;
     }
 
     private static Automaton buildAutomaton(String[] starts, String[]finals, String[] symbols, int numStates, HashMap<Integer, HashMap<String, ArrayList<String>>> transitions) {
